@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# vim fileencoding=utf-8
+# vim: set fileencoding=utf-8
 
 require 'escape_utils/url/rack'
 require 'twitter'
