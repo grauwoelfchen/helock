@@ -4,7 +4,7 @@
 require 'escape_utils/url/rack'
 require 'twitter'
 
-def send message
+def send_direct_message message
   Twitter.configure do |config|
     config.consumer_key       = ENV['CONSUMER_KEY']
     config.consumer_secret    = ENV['CONSUMER_SECRET']
@@ -13,11 +13,11 @@ def send message
   end
   to = 'grauwoelfchen'
   puts "#{Time.now}: dm to @#{to} #{message}"
-  Twitter.direct_message_create to, message
+  Twitter.direct_message_create(to, message) if message.length > 0
 end
 
 every(1.day, 'wake up', :at => ENV['WAKEUP_TIME']) do
   today = Time.now.wday
   messages = YAML::load(File.open('messages.yml'))
-  send messages[today] unless messages[today].nil?
+  send_direct_message messages[today] unless messages[today].nil?
 end
