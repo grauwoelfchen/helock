@@ -1,23 +1,43 @@
 #!/usr/bin/env ruby
-# vim: set fileencoding=utf-8
+# encoding: utf-8
 
-require 'escape_utils/url/rack'
 require 'twitter'
 
-def send_direct_message message
+def users
+  @users ||= (YAML::load(File.open('users.yml')) || [])
+end
+def messages
+  @messages ||= (YAML::load(File.open('messages.yml')) || [])
+end
+def production?
+  ENV['HELOCK_ENV'] != 'development'
+end
+def config
+  unless production?
+    [10.seconds, 'dev ;)']
+  else
+    [1.day, 'wake up', :at => ENV['WAKEUP_TIME']]
+  end
+end
+def log_direct_message user, message
+  puts "#{Time.now}: dm to @#{user} #{message}"
+end
+def send_direct_message user, message
   Twitter.configure do |config|
     config.consumer_key       = ENV['CONSUMER_KEY']
     config.consumer_secret    = ENV['CONSUMER_SECRET']
     config.oauth_token        = ENV['OAUTH_TOKEN']
     config.oauth_token_secret = ENV['OAUTH_TOKEN_SECRET']
   end
-  to = 'grauwoelfchen'
-  puts "#{Time.now}: dm to @#{to} #{message}"
-  Twitter.direct_message_create(to, message) if message.length > 0
+  log_direct_message user, message
+  Twitter.direct_message_create user, message
 end
 
-every(1.day, 'wake up', :at => ENV['WAKEUP_TIME']) do
+every(*config) do
   today = Time.now.wday
-  messages = YAML::load(File.open('messages.yml'))
-  send_direct_message messages[today] unless messages[today].nil?
+  action = production? ? 'send' : 'log'
+  users.each do |user|
+    message = messages[today].shuffle.first
+    send("#{action}_direct_message".to_sym, *[user, message])
+  end
 end
