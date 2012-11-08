@@ -3,8 +3,7 @@
 Helock is personal alarm clock on heroku.com.
 Every mornig, helock sends direct message to you.
 
-:-D < Good Morning !
-
+@helock_bot < Good Morning !
 
 ## Settings
 
