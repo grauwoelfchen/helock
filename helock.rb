@@ -39,6 +39,10 @@ every(*config) do
   action = production? ? 'send' : 'log'
   users.each do |user|
     message = messages[today].shuffle.first
-    send("#{action}_direct_message".to_sym, *[user, message])
+    begin
+      send("#{action}_direct_message".to_sym, *[user, message])
+    rescue Errno::ETIMEDOUT
+      puts "Time out Error :/"
+    end
   end
 end
