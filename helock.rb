@@ -7,12 +7,15 @@ require 'twitter'
 def users
   @users ||= (YAML::load(File.open('users.yml')) || [])
 end
+
 def messages
   @messages ||= (YAML::load(File.open('messages.yml')) || [])
 end
+
 def production?
   ENV['HELOCK_ENV'] != 'development'
 end
+
 def config
   unless production?
     [10.seconds, 'dev ;)']
@@ -20,9 +23,11 @@ def config
     [1.day, 'wake up', :at => ENV['WAKEUP_TIME']]
   end
 end
+
 def log_direct_message user, message
   puts "#{Time.now}: dm to @#{user} #{message}"
 end
+
 def send_direct_message user, message
   Twitter.configure do |config|
     config.consumer_key       = ENV['CONSUMER_KEY']
