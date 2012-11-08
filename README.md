@@ -1,6 +1,6 @@
 # Helock
 
-Helock is personal alarm clock on heroku.com.
+Helock is personal alarm clock worker on heroku.com.  
 Every mornig, helock sends direct message to you.
 
 @helock_bot < Good Morning !
@@ -37,3 +37,7 @@ Every mornig, helock sends direct message to you.
 - 'grauwoelfchen'
 - 'you'
 ```
+
+## License
+
+[MIT License](https://github.com/grauwoelfchen/helock/blob/master/LICENSE)
