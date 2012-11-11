@@ -9,13 +9,7 @@ Every mornig, helock sends direct message to you.
 
 ### ENV
 
-* CONSUMER\_KEY
-* CONSUMER\_SECRET
-* OAUTH\_TOKEN
-* OAUTH\_TOKEN\_SECRET
-* HELOCK\_ENV=development
-* TZ=Asia/Tokyo
-* WAKEUP\_TIME=06:00
+See [.env.sample](https://github.com/grauwoelfchen/helock/blob/master/.env.sample)
 
 ### messages.yaml
 
