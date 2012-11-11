@@ -3,6 +3,7 @@
 
 require 'yaml'
 require 'twitter'
+include Clockwork
 
 def users
   @users ||= (YAML::load(File.open('users.yml')) || [])
