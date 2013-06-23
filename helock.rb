@@ -3,52 +3,72 @@
 
 require 'yaml'
 require 'twitter'
-include Clockwork
 
-def users
-  @users ||= (YAML::load(File.open('users.yml')) || [])
-end
+class Helock
+  include Clockwork
 
-def messages
-  @messages ||= (YAML::load(File.open('messages.yml')) || [])
-end
+  attr_accessor :users, :messages
 
-def production?
-  ENV['HELOCK_ENV'] != 'development'
-end
-
-def config
-  unless production?
-    [10.seconds, 'dev ;)']
-  else
-    [1.day, 'wake up', :at => ENV['WAKEUP_TIME']]
+  def initialize
+    @users    = []
+    @messages = []
+    yield self if block_given?
   end
-end
 
-def log_direct_message user, message
-  puts "#{Time.now}: dm to @#{user} #{message}"
-end
-
-def send_direct_message user, message
-  Twitter.configure do |config|
-    config.consumer_key       = ENV['CONSUMER_KEY']
-    config.consumer_secret    = ENV['CONSUMER_SECRET']
-    config.oauth_token        = ENV['OAUTH_TOKEN']
-    config.oauth_token_secret = ENV['OAUTH_TOKEN_SECRET']
+  def production?
+    @_env ||= (ENV['HELOCK_ENV'] != 'development')
   end
-  log_direct_message user, message
-  Twitter.direct_message_create user, message
-end
 
-every(*config) do
-  today = Time.now.wday
-  action = production? ? 'send' : 'log'
-  users.each do |user|
-    message = messages[today].shuffle.first
+  def config
+    unless production?
+      [10.seconds, 'dev ;)']
+    else
+      [1.day, 'wake up', :at => ENV['WAKEUP_TIME']]
+    end
+  end
+
+  def run
+    every(*config) do
+      today = Time.now.wday
+      action = production? ? 'send' : 'log'
+      threads = []
+      users.each do |user|
+        threads << Thread.new do
+          message = messages[today].shuffle.first
+          send("#{action}_direct_message", *[user, message])
+        end
+      end
+      threads.map(&:join)
+    end
+  end
+
+  private
+
+  def log_direct_message(user, message)
+    puts "#{Time.now}: dm to @#{user} #{message}\n"
+  end
+
+  def send_direct_message(user, message)
     begin
-      send("#{action}_direct_message".to_sym, *[user, message])
+      client.direct_message_create(user, message)
+      log_direct_message(user, message)
     rescue Errno::ETIMEDOUT
-      puts "Time out Error :/"
+      puts "Time out Error :'(\n"
+    end
+  end
+
+  def client
+    @_client ||= Twitter.configure do |c|
+      c.consumer_key       = ENV['CONSUMER_KEY']
+      c.consumer_secret    = ENV['CONSUMER_SECRET']
+      c.oauth_token        = ENV['OAUTH_TOKEN']
+      c.oauth_token_secret = ENV['OAUTH_TOKEN_SECRET']
     end
   end
 end
+
+helock = Helock.new do |h|
+ h.users    = YAML::load(File.open('users.yml'))
+ h.messages = YAML::load(File.open('messages.yml'))
+end
+helock.run
