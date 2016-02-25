@@ -1,15 +1,23 @@
 # Helock
 
-Helock is personal alarm clock worker on heroku.com.  
-Every mornig, helock sends direct message to you.
+Helock is personal alarm clock worker running on heroku.  
+Every mornig, helock sends direct message to us.
 
-@helock_bot < Good Morning !
+[@helock_bot](https://twitter.com/helock_bot) < Good Morning !
+
 
 ## Settings
 
+```
+% git clone https://github.com/grauwoelfchen/helock.git
+% cd helock
+% bundle install --path .bundle/gems
+% mv {.env.sample,.env}
+```
+
 ### ENV
 
-See [.env.sample](https://github.com/grauwoelfchen/helock/blob/master/.env.sample)
+Edit [.env.sample](https://github.com/grauwoelfchen/helock/blob/master/.env.sample)
 
 ### messages.yaml
 
@@ -32,6 +40,15 @@ See [.env.sample](https://github.com/grauwoelfchen/helock/blob/master/.env.sampl
 - 'you'
 ```
 
+
+## Usage
+
+```
+% bundle exec foreman run clock
+```
+
+
 ## License
 
+Copyright (C) 2011 - 2016 Yasuhiro Asaka  \<grauwoelfchen@gmail.com\>  
 [MIT License](https://github.com/grauwoelfchen/helock/blob/master/LICENSE)

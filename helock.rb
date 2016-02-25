@@ -1,11 +1,8 @@
-#!/usr/bin/env ruby
-# encoding: utf-8
-
 require 'yaml'
 require 'twitter'
 
 class Helock
-  include Clockwork
+  include ::Clockwork
 
   attr_accessor :users, :messages
 
@@ -50,7 +47,7 @@ class Helock
 
   def send_direct_message(user, message)
     begin
-      client.direct_message_create(user, message)
+      client.create_direct_message(user, message)
       log_direct_message(user, message)
     rescue Errno::ETIMEDOUT
       puts "Time out Error :'(\n"
@@ -58,11 +55,11 @@ class Helock
   end
 
   def client
-    @_client ||= Twitter.configure do |c|
-      c.consumer_key       = ENV['CONSUMER_KEY']
-      c.consumer_secret    = ENV['CONSUMER_SECRET']
-      c.oauth_token        = ENV['OAUTH_TOKEN']
-      c.oauth_token_secret = ENV['OAUTH_TOKEN_SECRET']
+    @_client ||= Twitter::REST::Client.new do |c|
+      c.consumer_key        = ENV['CONSUMER_KEY']
+      c.consumer_secret     = ENV['CONSUMER_SECRET']
+      c.access_token        = ENV['OAUTH_TOKEN']
+      c.access_token_secret = ENV['OAUTH_TOKEN_SECRET']
     end
   end
 end
